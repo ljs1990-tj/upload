@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
+    <title>Document</title>
+</head>
+<body>
+    <div id="app">
+        <input type="file" @change="fnSelectFile" />
+        <button @click="fnUpload">Upload</button>
+        <p v-if="imageUrl">업로드 Url: <a :href="imageUrl" >{{ imageUrl }}</a></p>
+    </div>
+</body>
+</html>
+<script>
+    const app = Vue.createApp({
+        data() {
+            return {
+                selectedFile: null,
+                imageUrl: ''
+            };
+        },
+        methods: {
+            fnSelectFile(event) {
+                this.selectedFile = event.target.files[0];
+            },
+            fnUpload() {
+                var self = this;
+                if (!this.selectedFile) {
+                    alert("파일을 선택하세요.");
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('file', self.selectedFile);
+
+                $.ajax({
+                    url: 'http://43.203.9.221:3000/upload',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: (res) => {
+                        self.imageUrl = res.url;
+                        alert("파일이 성공적으로 업로드되었습니다.");
+                    }
+                });
+            }
+        }
+    });
+    app.mount('#app');
+</script>
